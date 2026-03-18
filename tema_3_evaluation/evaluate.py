@@ -29,15 +29,15 @@ async def test_chat(
     return data
 
 test_cases = [
-    # Adăugați un scenariu care să fie evaluat de LLM as a Judge
+    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
         input=""
     ),
-    # Adăugați un scenariu care să fie evaluat de LLM as a Judge
+    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
         input=""
     ),
-    # Adăugați un scenariu care să fie evaluat de LLM as a Judge
+    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
         input=""
     ),
@@ -46,7 +46,7 @@ test_cases = [
 groq_model = GroqDeepEval()
 
 evaluator1 = GEval(
-    # Adăugați numele metricii și criteriul de evaluare.
+    # ToDo: Adăugați numele metricii și criteriul de evaluare.
     name="",
     criteria="""    
     """,
@@ -55,7 +55,7 @@ evaluator1 = GEval(
 )
 
 evaluator2 = GEval(
-    # Adăugați numele metricii și criteriul de evaluare.
+    # ToDo: Adăugați numele metricii și criteriul de evaluare.
     name="",
     criteria="""    
     """,
@@ -99,11 +99,11 @@ def run_evaluation() -> None:
     threshold = 0.8
     # calculeaza cele 2 metrici pe baza pragului
     metric1 = sum(s >= threshold for s in scores1) / len(scores1)
-    # Adăugați numele metricii unde scrie ToDo
+    # ToDo: Adăugați numele metricii unde scrie ToDo
     print(f"ToDo (scor >= {threshold}): {metric1*100:.2f}%")
 
     metric2 = sum(s >= threshold for s in scores2) / len(scores2)
-    # Adăugați numele metricii unde scrie ToDo
+    # ToDo: Adăugați numele metricii unde scrie ToDo
     print(f"ToDo (scor >= {threshold}): {metric2*100:.2f}%")
 
 if __name__ == "__main__":
