@@ -13,7 +13,12 @@ import faiss
 
 load_dotenv()
 
-DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
+#DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "app_data")
+
 CHUNKS_JSON_PATH = os.path.join(DATA_DIR, "data_chunks.json")
 FAISS_INDEX_PATH = os.path.join(DATA_DIR, "faiss.index")
 FAISS_META_PATH = os.path.join(DATA_DIR, "faiss.index.meta")
@@ -42,12 +47,15 @@ class RAGAssistant:
 
         # ToDo: Adaugat o propozitie de referinta mai specifica pentru domeniul dvs
         self.relevance = self._embed_texts(
-            "Aceasta este o intrebare relevanta despre ...",
+            "Aceasta este o intrebare relevanta despre nutritie sanatoasa, dieta echilibrata, alimente nutritive si sanatate generala",
         )[0]
 
         # ToDo: Definiti un prompt de sistem mai detaliat pentru a ghida raspunsurile LLM-ului in directia dorita
         self.system_prompt = (
-            "..."
+            "Esti un expert in nutritie sanatoasa si asistenta dietetica. "
+            "Ofera sfaturi practice, bazate pe stiinta, despre dieta echilibrata, alimente nutritive, "
+            "valoarea nutritionala a alimentelor, si cum sa se traiasca mai sanatos. "
+            "Raspunsurile sa fie concise, utile si usor de inteles pentru persoana medie."
         )
 
 
@@ -94,7 +102,9 @@ class RAGAssistant:
             {
                 "role": "user",
                 "content": (
-                    "..."
+                    f"Pe baza acestor informatii despre nutritie:\n\n{context}\n\n"
+                    f"Raspunde la urmatoarea intrebare: {user_input}\n\n"
+                    f"Furnizeaza raspunsuri practice si utile care sa ajute persoana sa ia decizii mai bune privind alimentatia si sanatatea."
                 ),
             },
         ]
@@ -102,7 +112,7 @@ class RAGAssistant:
         try:
             response = self.client.chat.completions.create(
                 messages=messages,
-                model="openai/gpt-oss-20b",
+                model="llama-3.1-8b-instant"
             )
             return response.choices[0].message.content
         except Exception:
@@ -216,25 +226,27 @@ class RAGAssistant:
 
     def calculate_similarity(self, text: str) -> float:
         # ToDo: Ajustati aceasta propozitie de referinta pentru a se potrivi mai bine cu domeniul dvs, astfel incat sa reflecte mai precis ce inseamna "relevant" in contextul aplicatiei dvs.
-        """Returneaza similaritatea cu o propozitie de referinta despre ... ."""
+        """Returneaza similaritatea cu o propozitie de referinta despre nutritie sanatoasa ."""
         embedding = self._embed_texts(text.strip())[0]
         return self._cosine_similarity(embedding, self.relevance)
 
     def is_relevant(self, user_input: str) -> bool:
         # ToDo: Ajustati pragul de similaritate pentru a se potrivi mai bine cu domeniul dvs, astfel incat sa echilibreze corect intre a permite intrebari relevante si a respinge cele irelevante.
-        """Verifica daca intrarea utilizatorului e despre ...."""
+        """Verifica daca intrarea utilizatorului e despre nutritie sanatoasa ."""
         return self.calculate_similarity(user_input) >= 0.5
 
     def assistant_response(self, user_message: str) -> str:
         """Directioneaza mesajul utilizatorului catre calea potrivita."""
         if not user_message:
             # ToDo: Ajustati acest mesaj pentru a fi mai specific pentru domeniul dvs, astfel incat sa ghideze utilizatorii sa puna intrebari relevante si sa ofere un exemplu concret.
-            return "Te rog scrie un mesaj despre ... ."
+            return "Te rog scrie o intrebare despre nutritie sanatoasa, dieta, sau alimente. De exemplu: 'Care sunt alimentele bogate in proteine?' sau 'Cum pot avea o dieta echilibrata?'"
 
         if not self.is_relevant(user_message):
             # ToDo: Ajustati acest mesaj pentru a fi mai specific pentru domeniul dvs, astfel incat sa ghideze utilizatorii sa puna intrebari relevante si sa ofere un exemplu concret.
             return (
-                "..."
+                "Intrebarea ta nu pare sa fie legata de nutritie sanatoasa. "
+                "Te rog intreba ceva despre dieta, alimente nutritive, sanatate si wellness. "
+                "Exemplu: 'Care sunt beneficiile laptelui?' sau 'Cum pot reduce zaharurile din dieta?'"
             )
 
         chunks = self._load_documents_from_web()
@@ -245,5 +257,5 @@ class RAGAssistant:
 if __name__ == "__main__":
     assistant = RAGAssistant()
     # ToDo: Testati cu intrebari relevante pentru domeniul dvs, precum si cu intrebari irelevante pentru a va asigura ca logica de filtrare functioneaza corect.
-    print(assistant.assistant_response("..."))  # test relevant
-    print(assistant.assistant_response("..."))  # test irelevant
+    print(assistant.assistant_response("Care sunt alimentele bogate in calciu pentru oasele puternice?"))  # test relevant
+    print(assistant.assistant_response("Cine a castigat campionatul mondial de fotbal?"))  # test irelevant
