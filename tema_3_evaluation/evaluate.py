@@ -13,36 +13,32 @@ load_dotenv()
 BASE_URL = "http://127.0.0.1:8000"
 THRESHOLD = 0.8
 
+# 3 scenarii reale pentru evaluare
 test_cases = [
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
-    LLMTestCase(
-        input=""
-    ),
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
-    LLMTestCase(
-        input=""
-    ),
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
-    LLMTestCase(
-        input=""
-    ),
+    LLMTestCase(input="Care sunt alimentele bogate în proteine?"),
+    LLMTestCase(input="Ce pot mânca seara ca să nu mă îngraș?"),
+    LLMTestCase(input="Cum pot reduce zahărul din dietă?")
 ]
 
 groq_model = GroqDeepEval()
 
+# Metrică 1: Relevance
 evaluator1 = GEval(
-    # ToDo: Adăugați numele metricii și criteriul de evaluare.
-    name="",
-    criteria="""    
+    name="Relevance",
+    criteria="""
+    Evaluează cât de relevant este răspunsul pentru întrebarea utilizatorului.
+    Un scor mare înseamnă că răspunsul este clar, direct și la subiect.
     """,
     evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
     model=groq_model,
 )
 
+# Metrică 2: Helpfulness
 evaluator2 = GEval(
-    # ToDo: Adăugați numele metricii și criteriul de evaluare.
-    name="",
-    criteria="""    
+    name="Helpfulness",
+    criteria="""
+    Evaluează cât de util, aplicabil și practic este răspunsul.
+    Un scor mare înseamnă că oferă sfaturi concrete și ușor de urmat.
     """,
     evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
     model=groq_model,
@@ -74,17 +70,15 @@ async def _run_evaluation() -> tuple[list[dict], list[float], list[float]]:
             evaluator2.measure(case)
 
             print(f"[{i}/{len(test_cases)}] {case.input[:60]}...")
-            # ToDo: Personalizați afișarea scorurilor pentru fiecare metrică.
-            print(f"  #ToDo: {evaluator1.score:.2f} | #ToDo: {evaluator2.score:.2f}")
+            print(f"  Relevance: {evaluator1.score:.2f} | Helpfulness: {evaluator2.score:.2f}")
 
             results.append({
                 "input": case.input,
-                "response": candidate.get("response", str(candidate)) if isinstance(candidate, dict) else str(candidate),
-                # ToDo: Adăugați în dicționar scorurile și motivele pentru fiecare metrică.
-                "#ToDo_score": evaluator1.score,
-                "#ToDo_reason": evaluator1.reason,
-                "#ToDo_score": evaluator2.score,
-                "#ToDo_reason": evaluator2.reason,
+                "response": candidate.get("response", str(candidate)),
+                "relevance_score": evaluator1.score,
+                "relevance_reason": evaluator1.reason,
+                "helpfulness_score": evaluator2.score,
+                "helpfulness_reason": evaluator2.reason,
             })
             scores1.append(evaluator1.score)
             scores2.append(evaluator2.score)

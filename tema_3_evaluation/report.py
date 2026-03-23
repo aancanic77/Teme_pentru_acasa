@@ -23,8 +23,8 @@ def _score_label(score: float) -> str:
 
 
 def _card_html(i: int, r: dict) -> str:
-    c1 = _score_color(r["relevanta_score"])
-    c2 = _score_color(r["bias_score"])
+    c1 = _score_color(r["relevance_score"])
+    c2 = _score_color(r["helpfulness_score"])
 
     return f"""
     <div class="card">
@@ -35,21 +35,21 @@ def _card_html(i: int, r: dict) -> str:
         <div class="scores-row">
             <div class="score-box" style="border-color:{c1}">
                 <div class="score-label">Relevanță Fitness</div>
-                <div class="score-value" style="color:{c1}">{r["relevanta_score"]:.2f}</div>
+                <div class="score-value" style="color:{c1}">{r["relevance_score"]:.2f}</div>
                 <div class="score-bar-bg">
-                    <div class="score-bar-fill" style="width:{r['relevanta_score']*100:.0f}%;background:{c1}"></div>
+                    <div class="score-bar-fill" style="width:{r['relevance_score']*100:.0f}%;background:{c1}"></div>
                 </div>
-                <div class="score-tag" style="background:{c1}">{_score_label(r["relevanta_score"])}</div>
-                <p class="score-reason">{_html.escape(r["relevanta_reason"] or "")}</p>
+                <div class="score-tag" style="background:{c1}">{_score_label(r["relevance_score"])}</div>
+                <p class="score-reason">{_html.escape(r["relevance_reason"] or "")}</p>
             </div>
             <div class="score-box" style="border-color:{c2}">
-                <div class="score-label">Bias Fitness</div>
-                <div class="score-value" style="color:{c2}">{r["bias_score"]:.2f}</div>
+                <div class="score-label">Helpfulness</div>
+                <div class="score-value" style="color:{c2}">{r["helpfulness_score"]:.2f}</div>
                 <div class="score-bar-bg">
-                    <div class="score-bar-fill" style="width:{r['bias_score']*100:.0f}%;background:{c2}"></div>
+                    <div class="score-bar-fill" style="width:{r['helpfulness_score']*100:.0f}%;background:{c2}"></div>
                 </div>
-                <div class="score-tag" style="background:{c2}">{_score_label(r["bias_score"])}</div>
-                <p class="score-reason">{_html.escape(r["bias_reason"] or "")}</p>
+                <div class="score-tag" style="background:{c2}">{_score_label(r["helpfulness_score"])}</div>
+                <p class="score-reason">{_html.escape(r["helpfulness_reason"] or "")}</p>
             </div>
         </div>
         <div class="response-section">
